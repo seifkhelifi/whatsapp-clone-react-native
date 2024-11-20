@@ -28,7 +28,15 @@ export default function ListProfile(props) {
             <FlatList
                 data={data}
                 renderItem={({ item }) => {
-                    return <Text>{item.nom}</Text>;
+                    return (
+                        <Text
+                            onPress={() => {
+                                props.navigation.navigate("Chat", { nom: item.nom });         
+                            }}
+                        >
+                            {item.nom}
+                        </Text>
+                    );
                 }}
                 style={{ backgroundColor: "#fff4", width: "95%" }}
             ></FlatList>
