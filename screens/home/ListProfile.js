@@ -25,7 +25,7 @@ export default function ListProfile(props) {
         <ImageBackground source={require("../../assets/gfgf.png")} style={styles.container}>
             <StatusBar style="light" />
             <Text style={styles.textstyle}>My Account</Text>
-            <FlatList
+            <FlatList   
                 data={data}
                 renderItem={({ item }) => {
                     return (
