@@ -6,13 +6,15 @@ const database = firebase.database();
 const ref_les_profils = database.ref("lesprefix");
 
 export default function ListProfile(props) {
+    const currentId = props.route.params.currentId;
+
     const [data, setData] = useState([]);
     useEffect(() => {
         //importer les données
         ref_les_profils.on("value", (snapshot) => {
             const d = [];
             snapshot.forEach((unProfil) => {
-                d.push(unProfil.val());
+                if (unProfil.val.id != currentId) d.push(unProfil.val());
             });
             setData(d);
         });
@@ -25,13 +27,13 @@ export default function ListProfile(props) {
         <ImageBackground source={require("../../assets/gfgf.png")} style={styles.container}>
             <StatusBar style="light" />
             <Text style={styles.textstyle}>My Account</Text>
-            <FlatList   
+            <FlatList
                 data={data}
                 renderItem={({ item }) => {
                     return (
                         <Text
                             onPress={() => {
-                                props.navigation.navigate("Chat", { nom: item.nom });         
+                                props.navigation.navigate("Chat", { nom: item.nom });
                             }}
                         >
                             {item.nom}

@@ -17,3 +17,12 @@ const firebaseConfig = {
 const firebase = app.initializeApp(firebaseConfig);
 
 export default firebase;
+
+import { createClient } from "@supabase/supabase-js";
+
+const supabaseUrl = "https://scsquemguekeeekxssfy.supabase.co";
+const supabaseKey =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNjc3F1ZW1ndWVrZWVla3hzc2Z5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI3MTI3MDgsImV4cCI6MjA0ODI4ODcwOH0.umJuE1_WxkdsFhCdaW_vSeNdZVcoHkPuO88M8_La1G0";
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+export { supabase };

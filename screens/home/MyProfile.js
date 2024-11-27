@@ -1,5 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
+import * as ImagePicker from "expo-image-picker";
 import {
     Image,
     ImageBackground,
@@ -7,27 +8,79 @@ import {
     Text,
     TextInput,
     TouchableHighlight,
+    View,
+    Button,
 } from "react-native";
 import firebase from "../../config";
+
 const database = firebase.database();
 
-export default function MyProfile() {
+export default function MyProfile(props) {
+    const currentId = props.route.params.currentId;
+
     const [nom, setNom] = useState();
     const [pseudo, setpseudo] = useState();
     const [telephone, setTelephone] = useState();
+
+    const [isDefaultImage, setisDefaultImage] = useState(true);
+    const [uriLocalImage, seturiLocalImage] = useState();
+    const [localImage, setlocalImage] = useState();
+
+    const pickImage = async () => {
+        // No permissions request is necessary for launching the image library
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ["images", "videos"],
+            allowsEditing: false,
+            aspect: [4, 3],
+            quality: 1,
+        });
+
+        console.log(result);
+
+        if (!result.canceled) {
+            setisDefaultImage(false);
+            seturiLocalImage(result.assets[0].uri);
+            setlocalImage(result.assets[0].fileName);
+        }
+    };
+
+    const uploadImageToStorage = async () => {
+        const res = await fetch(uri);
+        const blob = await res.blob();
+        const arraybuffer = await new Response(blob).arrayBuffer();
+
+        await supabase.storage.from("ProfileImage").upload(currentId, arraybuffer, {
+            upsert: true,
+        });
+
+        const { data } = supabase.storage.from("ProfileImage").getPublicUrl(currentId);
+        return data.publicUrl;
+    };
 
     return (
         <ImageBackground source={require("../../assets/gfgf.png")} style={styles.container}>
             <StatusBar style="light" />
             <Text style={styles.textstyle}>My Account</Text>
 
+            <TouchableHighlight onPress={() => pickImage()}>
+                <Image
+                    source={
+                        isDefaultImage ? require("../../assets/icon.png") : { uri: uriLocalImage }
+                    }
+                    style={{
+                        height: 200,
+                        width: 200,
+                    }}
+                />
+            </TouchableHighlight>
+            {/* 
             <Image
-                source={require("../../assets/gfgf.png")}
+                source={isDefaultImage ? require("../../assets/gfgf.png") : { uri: uriLocalImage }}
                 style={{
                     height: 200,
                     width: 200,
                 }}
-            />
+            /> */}
 
             <TextInput
                 onChangeText={(text) => {
@@ -59,17 +112,18 @@ export default function MyProfile() {
                 style={styles.textinputstyle}
             ></TextInput>
             <TouchableHighlight
-                onPress={() => {
+                onPress={async () => {
+                    const uriImage = await uploadImageToStorage();
+
                     const ref_les_profils = database.ref("lesprefix");
                     const key = ref_les_profils.push().key;
-                    const ref_unprofil = ref_les_profils.child("unprofil_"+key);
-                    ref_unprofil.set(
-                      {
+                    const ref_unprofil = ref_les_profils.child("unprofil_" + currentId);
+                    ref_unprofil.set({
                         nom,
                         pseudo,
-                        telephone
-                      }
-                    );
+                        telephone,
+                        uriImage,
+                    });
                 }}
                 activeOpacity={0.5}
                 underlayColor="#DDDDDD"
@@ -123,5 +177,9 @@ const styles = StyleSheet.create({
         backgroundColor: "#fff",
         alignItems: "center",
         justifyContent: "center",
+    },
+    image: {
+        width: 200,
+        height: 200,
     },
 });

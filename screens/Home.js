@@ -6,12 +6,17 @@ import MyProfile from "./home/MyProfile";
 
 const Tab = createMaterialBottomTabNavigator();
 
-export default function Home() {
+export default function Home(props) {
+    const currentId = props.route.params.currentId;
     return (
         <Tab.Navigator>
             <Tab.Screen name="ListProfile" component={ListProfile}></Tab.Screen>
             <Tab.Screen name="Group" component={Group}></Tab.Screen>
-            <Tab.Screen name="MyProfile" component={MyProfile}></Tab.Screen>
+            <Tab.Screen
+                name="MyProfile"
+                component={MyProfile}
+                initialParams={currentId}
+            ></Tab.Screen>
         </Tab.Navigator>
     );
 }
